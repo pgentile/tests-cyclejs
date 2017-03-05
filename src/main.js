@@ -1,9 +1,11 @@
 import xs from 'xstream';
 import { run } from '@cycle/run';
-import { makeDOMDriver, h1 } from '@cycle/dom';
+import { makeDOMDriver, h1, div } from '@cycle/dom';
+import { makeHTTPDriver } from '@cycle/http';
 
-import { column, row } from './components/foundation';
+import { rowAndColumn } from './components/foundation';
 import Multiplicator from './components/Multiplicator';
+import TodoList from './components/TodoList';
 
 
 function main(sources) {
@@ -16,23 +18,36 @@ function main(sources) {
 
   const multiplicator = Multiplicator({ ...sources, props: multiplicatorProps$ });
 
-  const vdom$ = multiplicator.DOM
-    .map(multiplicatorVdom => (
-      row([
-        column([
+  const todoList = TodoList(sources);
+
+  const vdom$ = xs
+    .combine(multiplicator.DOM, todoList.DOM)
+    .map(([multiplicatorVdom, todoListVdom]) => (
+      div([
+        rowAndColumn([
           h1(['Hello, you !']),
+        ]),
+        rowAndColumn([
           multiplicatorVdom
+        ]),
+        rowAndColumn([
+          todoListVdom
         ])
       ])
+
     ));
 
+  const request$ = todoList.HTTP;
+
   return {
-    DOM: vdom$
+    DOM: vdom$,
+    HTTP: request$
   };
 }
 
 const drivers = {
   DOM: makeDOMDriver('#app'),
+  HTTP: makeHTTPDriver()
 };
 
 run(main, drivers);
