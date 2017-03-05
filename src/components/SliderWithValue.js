@@ -1,5 +1,5 @@
 import xs from 'xstream';
-import { p, label, small } from '@cycle/dom';
+import { div, p, label } from '@cycle/dom';
 
 import Slider from './Slider';
 
@@ -16,14 +16,13 @@ function model(props$, newValue$) {
 function view(props$, state$, sliderVdom$) {
   return xs.combine(props$, state$, sliderVdom$)
     .map(([props, state, sliderVdom]) => {
-      return p([
+      return div([
         label([
           props.name,
           ' ',
-          sliderVdom,
-          ' ',
-          small([`Value is ${state.value}`])
-        ])
+          sliderVdom
+        ]),
+        p('.help-text', `Value is ${state.value}`)
       ]);
     });
 }

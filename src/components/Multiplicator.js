@@ -1,7 +1,8 @@
 import xs from 'xstream';
-import { div, hr, p } from '@cycle/dom';
+import { hr, p } from '@cycle/dom';
 import isolate from '@cycle/isolate';
 
+import { column, row } from './foundation';
 import SliderWithValue from './SliderWithValue';
 
 
@@ -17,12 +18,12 @@ function model(props$, x$, y$) {
 function view(state$, sliderX$, sliderY$) {
   return xs.combine(state$, sliderX$, sliderY$)
     .map(([state, sliderX, sliderY]) => (
-      div([
-        sliderX,
-        sliderY,
-        hr(),
-        p([
-          `Value multiplicated: ${state.value}`
+      row([
+        column([
+          sliderX,
+          sliderY,
+          hr(),
+          p(`Value multiplicated: ${state.value}`)
         ])
       ])
     ));
@@ -40,8 +41,8 @@ export default function Multiplicator(sources) {
 
   const props$ = sources.props;
 
-  const sliderXProps$ = props$.map(props => ({...createCommonProps(props), value: props.x, name: 'X'}));
-  const sliderYProps$ = props$.map(props => ({...createCommonProps(props), value: props.y, name: 'Y'}));
+  const sliderXProps$ = props$.map(props => ({ ...createCommonProps(props), value: props.x, name: 'X' }));
+  const sliderYProps$ = props$.map(props => ({ ...createCommonProps(props), value: props.y, name: 'Y' }));
 
   const initialProps$ = xs.combine(sliderXProps$, sliderYProps$)
     .map(([sliderXProps, sliderYProps]) => ({ x: sliderXProps.value, y: sliderYProps.value }));

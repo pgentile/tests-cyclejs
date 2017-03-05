@@ -1,7 +1,8 @@
 import xs from 'xstream';
 import { run } from '@cycle/run';
-import { makeDOMDriver, div, h1, hr } from '@cycle/dom';
+import { makeDOMDriver, h1, hr } from '@cycle/dom';
 
+import { column, row } from './components/foundation';
 import Multiplicator from './components/Multiplicator';
 
 
@@ -17,10 +18,12 @@ function main(sources) {
 
   const vdom$ = multiplicator.DOM
     .map(multiplicatorVdom => (
-      div([
-        h1(['Hello, you !']),
-        hr(),
-        multiplicatorVdom
+      row([
+        column([
+          h1(['Hello, you !']),
+          hr(),
+          multiplicatorVdom
+        ])
       ])
     ));
 
