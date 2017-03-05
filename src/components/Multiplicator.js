@@ -1,5 +1,5 @@
 import xs from 'xstream';
-import { hr, p } from '@cycle/dom';
+import { div, p, b } from '@cycle/dom';
 import isolate from '@cycle/isolate';
 
 import { column, row } from './foundation';
@@ -18,12 +18,22 @@ function model(props$, x$, y$) {
 function view(state$, sliderX$, sliderY$) {
   return xs.combine(state$, sliderX$, sliderY$)
     .map(([state, sliderX, sliderY]) => (
-      row([
-        column([
-          sliderX,
-          sliderY,
-          hr(),
-          p(`Value multiplicated: ${state.value}`)
+      div([
+        row([
+          column([
+            sliderX
+          ]),
+          column([
+            sliderY
+          ])
+        ]),
+        row([
+          column([
+            p([
+              'Value multiplicated: ',
+              b(state.value)
+            ])
+          ])
         ])
       ])
     ));

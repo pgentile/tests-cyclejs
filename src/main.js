@@ -1,6 +1,6 @@
 import xs from 'xstream';
 import { run } from '@cycle/run';
-import { makeDOMDriver, h1, hr } from '@cycle/dom';
+import { makeDOMDriver, h1 } from '@cycle/dom';
 
 import { column, row } from './components/foundation';
 import Multiplicator from './components/Multiplicator';
@@ -21,7 +21,6 @@ function main(sources) {
       row([
         column([
           h1(['Hello, you !']),
-          hr(),
           multiplicatorVdom
         ])
       ])
