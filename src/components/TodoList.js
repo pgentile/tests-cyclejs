@@ -22,18 +22,13 @@ export default function TodoList(sources) {
 
   const todoComponentList$ = todoList$
     .map(todoList => {
-      return todoList.map(todo => Todo({ ...sources, props: xs.of({ todo: todo }) }));
+      return todoList.map(todo => {
+        return Todo({ ...sources, props: xs.of({ todo: todo }) })
+      });
     });
 
   const vdom$ = todoComponentList$
-    .map(todoComponentList => {
-      const todoListVdom$ = xs.fromArray(todoComponentList)
-        .map(component => component.DOM)
-        .flatten()
-        .compose(toList);
-
-      return todoListVdom$;
-    })
+    .map(toVdomList)
     .flatten()
     .map(todoListVdom => {
       return div('.todos', [
@@ -51,6 +46,13 @@ export default function TodoList(sources) {
 }
 
 
-function toList(stream) {
-  return stream.fold((list, item) => [...list, item], []);
+function toVdomList(components) {
+  return xs.fromArray(components)
+    .map(component => component.DOM)
+    .flatten()
+    .compose(toList);
+}
+
+function toList(stream$) {
+  return stream$.fold((list, item) => [...list, item], []);
 }
