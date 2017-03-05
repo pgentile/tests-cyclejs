@@ -1,3 +1,4 @@
+import xs from 'xstream';
 import { run } from '@cycle/run';
 import { makeDOMDriver, div, h1, hr } from '@cycle/dom';
 
@@ -5,7 +6,14 @@ import Multiplicator from './components/Multiplicator';
 
 
 function main(sources) {
-  const multiplicator = Multiplicator(sources);
+  const multiplicatorProps$ = xs.of({
+    x: 0,
+    y: 0,
+    min: -200,
+    max: 200
+  });
+
+  const multiplicator = Multiplicator({ ...sources, props: multiplicatorProps$ });
 
   const vdom$ = multiplicator.DOM
     .map(multiplicatorVdom => (

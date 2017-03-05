@@ -33,19 +33,15 @@ function IsolatedSliderWithValue(sources) {
 }
 
 export default function Multiplicator(sources) {
-  const sliderXProps$ = xs.of({
-    name: 'X',
-    value: 50,
-    min: 0,
-    max: 100
+  const createCommonProps = props => ({
+    min: props.min,
+    max: props.max
   });
 
-  const sliderYProps$ = xs.of({
-    name: 'Y',
-    value: 0,
-    min: -200,
-    max: 200
-  });
+  const props$ = sources.props;
+
+  const sliderXProps$ = props$.map(props => ({...createCommonProps(props), value: props.x, name: 'X'}));
+  const sliderYProps$ = props$.map(props => ({...createCommonProps(props), value: props.y, name: 'Y'}));
 
   const initialProps$ = xs.combine(sliderXProps$, sliderYProps$)
     .map(([sliderXProps, sliderYProps]) => ({ x: sliderXProps.value, y: sliderYProps.value }));
