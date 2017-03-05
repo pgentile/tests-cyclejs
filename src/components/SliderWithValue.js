@@ -4,43 +4,33 @@ import { p } from '@cycle/dom';
 import Slider from './Slider';
 
 
-export default function SliderWithValue(sources) {
-  const props$ = sources.props;
-
-  const sliderProps$ = props$
-    .map(props => ({
-      value: props.value,
-      min: props.min,
-      max: props.max
-    }));
-
-  const slider = Slider({
-    ...sources,
-    props: sliderProps$
-  });
-
-  const sliderVdom$ = slider.DOM;
-  const sliderValue$ = slider.value;
-
-  const state$ = xs
-    .combine(props$, sliderValue$)
-    .map(([props, sliderValue]) => ({
-      name: props.name,
-      value: sliderValue,
+function model(props$, newValue$) {
+  const initialValue$ = props$.map(props => props.value).take(1);
+  return xs.merge(initialValue$, newValue$)
+    .map(newValue => ({
+      value: newValue
     }))
     .remember();
+}
 
-  const vdom$ = xs
-    .combine(state$, sliderVdom$)
-    .map(([state, sliderVdom]) => {
+function view(props$, state$, sliderVdom$) {
+  return xs.combine(props$, state$, sliderVdom$)
+    .map(([props, state, sliderVdom]) => {
       return p([
         sliderVdom,
-        ` Name is ${state.name}, value is ${state.value}`
+        ` Name is ${props.name}, value is ${state.value}`
       ]);
     });
+}
+
+export default function SliderWithValue(sources) {
+  const slider = Slider(sources);
+  const state$ = model(sources.props, slider.value);
+  const vdom$ = view(sources.props, state$, slider.DOM);
+  const value$ = state$.map(state => state.value);
 
   return {
     DOM: vdom$,
-    value: sliderValue$
+    value: value$
   };
 }
