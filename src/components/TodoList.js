@@ -1,58 +1,68 @@
 import xs from 'xstream';
 import { div, h1 } from '@cycle/dom';
+import isolate from '@cycle/isolate';
 
-import { rowAndColumn } from './foundation';
+
+import { row, column } from './foundation';
 import Todo from './Todo';
 
 
 export default function TodoList(sources) {
-  const request$ = xs.of({
-    url: 'https://jsonplaceholder.typicode.com/todos',
-    category: 'TodoList'
-  });
+  const todo$ = sources.todo$;
 
-  const response$ = sources.HTTP
-    .select('TodoList')
+  const proxyDelete$ = xs.create();
+
+  const realTodos$ = todo$
+    /*
+    .compose(toList)
+    .map(todoList => xs.from(todoList))
+    .debug('Got todo list')
+    .map(todoList$ => {
+      return xs.combine(todoList$, proxyDelete$)
+        .debug('Combined')
+        .map(([todoList, deleteAction]) => {
+          console.debug('deleteAction =', deleteAction);
+          return todoList;
+        });
+    })
+    .flatten()
+    */
+    ;
+
+  const todoComponent$ = realTodos$
+    .map(todo => {
+      return isolate(Todo)({ ...sources, todo$: xs.of(todo) });
+    })
+    .debug('TODO');
+
+  const todoComponentVdom$ = todoComponent$
+    .map(todoComponent => todoComponent.DOM)
     .flatten();
 
-  const todoList$ = response$
-    .map(response => response.body)
-    .startWith([])
-    .debug('Got todo list');
+  const vdom$ = todoComponentVdom$
+    .compose(toList)
+    .debug('VDOM')
+    .map(todoComponentVdom => {
 
-  const todoComponentList$ = todoList$
-    .map(todoList => {
-      return todoList.map(todo => {
-        return Todo({ ...sources, props: xs.of({ todo: todo }) })
-      });
-    });
-
-  const vdom$ = todoComponentList$
-    .map(toVdomList)
-    .flatten()
-    .map(todoListVdom => {
       return div('.todos', [
-        rowAndColumn([
-          h1('Todo list')
-        ]),
-        rowAndColumn(todoListVdom)
+        row(column(h1('Todo list'))),
+        row(column(todoComponentVdom))
       ]);
+
     });
+
+  const deleteTodoArray = todoComponent$.map(component => component.delete$);
+
+  const deleteTodo$ = xs.merge(...deleteTodoArray);
+
+  proxyDelete$.imitate(deleteTodo$);
 
   return {
     DOM: vdom$,
-    HTTP: request$
   };
 }
 
 
-function toVdomList(components) {
-  return xs.fromArray(components)
-    .map(component => component.DOM)
-    .flatten()
-    .compose(toList);
-}
-
 function toList(stream$) {
-  return stream$.fold((list, item) => [...list, item], []);
+  return stream$.fold((items, item) => [...items, item], []);
 }

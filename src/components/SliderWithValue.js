@@ -17,11 +17,7 @@ function view(props$, state$, sliderVdom$) {
   return xs.combine(props$, state$, sliderVdom$)
     .map(([props, state, sliderVdom]) => {
       return div([
-        label([
-          props.name,
-          ' ',
-          sliderVdom
-        ]),
+        label([props.name, ' ', sliderVdom]),
         p('.help-text', `Value is ${state.value}`)
       ]);
     });

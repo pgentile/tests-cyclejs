@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 
 // Load packages names
@@ -10,11 +10,11 @@ const vendorLibs = Object.keys(packageContent.dependencies);
 
 module.exports = {
   entry: {
-      app: [
-        './src/main.js',
-        './src/main.scss',
-      ],
-      vendor: vendorLibs,
+    app: [
+      './src/main.js',
+      './src/main.scss',
+    ],
+    vendor: vendorLibs,
   },
   resolve: {
     modules: [
@@ -22,7 +22,7 @@ module.exports = {
       'node_modules',
     ],
     alias: {
-        'jquery': 'jquery/src/jquery',
+      'jquery': 'jquery/src/jquery',
     },
     extensions: ['.js', '.scss', '.css'],
   },
@@ -36,6 +36,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         enforce: 'pre',
         use: [
           'eslint-loader',
@@ -43,6 +44,7 @@ module.exports = {
       },
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         use: [
           'babel-loader?cacheDirectory',
         ],

@@ -2,9 +2,5 @@
   "presets": [
     "es2015",
     "stage-2"
-  ],
-  "plugins": [
-    "import-asserts",
-    "transform-strict-mode"
   ]
 }
